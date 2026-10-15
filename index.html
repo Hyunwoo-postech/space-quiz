@@ -178,6 +178,15 @@
       { category: "The next frontier", question: "What is NASA's program to return humans to the Moon called?", answers: ["Gemini", "Artemis", "Mercury", "Voyager"], correct: 1, fact: "Artemis aims to return humans to the Moon and build experience for future crewed missions to Mars." }
     ];
     const byId = id => document.getElementById(id);
+    function shuffledQuestionOrder() {
+      const order = Array.from({ length: questions.length }, (_, index) => index);
+      for (let index = order.length - 1; index > 0; index--) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [order[index], order[swapIndex]] = [order[swapIndex], order[index]];
+      }
+      return order;
+    }
+    let questionOrder = shuffledQuestionOrder();
     let current = 0;
     let score = 0;
     let answered = false;
@@ -189,7 +198,7 @@
 
     function renderQuestion(focus = false) {
       answered = false;
-      const item = questions[current];
+      const item = questions[questionOrder[current]];
       byId("question-count").innerHTML = `<strong>Question ${String(current + 1).padStart(2, "0")}</strong> / 10`;
       byId("category").textContent = item.category;
       byId("question").textContent = item.question;
@@ -212,7 +221,7 @@
     function selectAnswer(selected) {
       if (answered) return;
       answered = true;
-      const item = questions[current];
+      const item = questions[questionOrder[current]];
       const correct = selected === item.correct;
       if (correct) score++;
       byId("score").textContent = `${score} ${score === 1 ? "point" : "points"}`;
@@ -263,6 +272,7 @@
     });
 
     byId("restart").addEventListener("click", () => {
+      questionOrder = shuffledQuestionOrder();
       current = 0;
       score = 0;
       byId("score").textContent = "0 points";
